@@ -21,10 +21,10 @@ app.use(
 );
 
 const typeDefs = gql(fs.readFileSync("./schema.graphql", { encoding: "utf8" }));
-
 const resolvers = require("./resolvers");
-
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+// relies on expressJWT middleware
+const context = ({ req }) => ({ user: req.user && db.users.get(req.user.sub) });
+const apolloServer = new ApolloServer({ typeDefs, resolvers, context });
 apolloServer.applyMiddleware({ app, path: "/graphql" });
 
 app.post("/login", (req, res) => {
